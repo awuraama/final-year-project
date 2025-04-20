@@ -1,0 +1,51 @@
+plugins {
+    id "com.android.application"
+    id "kotlin-android"
+    id "dev.flutter.flutter-gradle-plugin" // Flutter Gradle Plugin
+}
+
+android {
+    namespace = "com.example.student_planner_app"
+    compileSdk = 33  // Explicit compileSdk version
+    ndkVersion = "25.1.8937393" // Set a valid NDK version if required
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+
+    defaultConfig {
+        applicationId = "com.example.student_planner_app"
+        minSdk = 21  // Minimum supported version
+        targetSdk = 33  // Target version
+        versionCode = 1
+        versionName = "1.0"
+        multiDexEnabled true
+    }
+
+    buildTypes {
+        release {
+            signingConfig = signingConfigs.debug
+        }
+    }
+
+    buildFeatures {
+        buildConfig = true  // Enable BuildConfig feature
+    }
+}
+
+dependencies {
+    implementation 'com.google.firebase:firebase-bom:32.2.0' // Firebase BOM
+    implementation 'com.google.firebase:firebase-analytics' // Example Firebase service
+    implementation 'androidx.multidex:multidex:2.0.1' // For multiDex support
+}
+
+flutter {
+    source = "../.."
+}
+
+apply plugin: 'com.google.gms.google-services'  // Firebase plugin
