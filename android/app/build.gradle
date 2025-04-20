@@ -1,13 +1,17 @@
 plugins {
     id "com.android.application"
+    // START: FlutterFire Configuration
+    id 'com.google.gms.google-services'
+    // END: FlutterFire Configuration
     id "kotlin-android"
-    id "dev.flutter.flutter-gradle-plugin" // Flutter Gradle Plugin
+    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
+    id "dev.flutter.flutter-gradle-plugin"
 }
 
 android {
     namespace = "com.example.student_planner_app"
-    compileSdk = 33  // Explicit compileSdk version
-    ndkVersion = "25.1.8937393" // Set a valid NDK version if required
+    compileSdk = flutter.compileSdkVersion
+    ndkVersion = flutter.ndkVersion
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -15,37 +19,29 @@ android {
     }
 
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = JavaVersion.VERSION_1_8
     }
 
     defaultConfig {
+        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.example.student_planner_app"
-        minSdk = 21  // Minimum supported version
-        targetSdk = 33  // Target version
-        versionCode = 1
-        versionName = "1.0"
-        multiDexEnabled true
+        // You can update the following values to match your application needs.
+        // For more information, see: https://flutter.dev/to/review-gradle-config.
+        minSdk = flutter.minSdkVersion
+        targetSdk = flutter.targetSdkVersion
+        versionCode = flutter.versionCode
+        versionName = flutter.versionName
     }
 
     buildTypes {
         release {
+            // TODO: Add your own signing config for the release build.
+            // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.debug
         }
     }
-
-    buildFeatures {
-        buildConfig = true  // Enable BuildConfig feature
-    }
-}
-
-dependencies {
-    implementation 'com.google.firebase:firebase-bom:32.2.0' // Firebase BOM
-    implementation 'com.google.firebase:firebase-analytics' // Example Firebase service
-    implementation 'androidx.multidex:multidex:2.0.1' // For multiDex support
 }
 
 flutter {
     source = "../.."
 }
-
-apply plugin: 'com.google.gms.google-services'  // Firebase plugin

@@ -23,9 +23,15 @@ class DefaultFirebaseOptions {
       case TargetPlatform.android:
         return android;
       case TargetPlatform.iOS:
-        return ios;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for ios - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.macOS:
-        return macos;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for macos - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.windows:
         return windows;
       case TargetPlatform.linux:
@@ -55,24 +61,6 @@ class DefaultFirebaseOptions {
     messagingSenderId: '812212502944',
     projectId: 'student-planner-app-97c0e',
     storageBucket: 'student-planner-app-97c0e.firebasestorage.app',
-  );
-
-  static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyDDCSeqTMVke95Sam-HvlRZcFsNKGtuRyY',
-    appId: '1:812212502944:ios:2b7f47badfdc8440aaa4c5',
-    messagingSenderId: '812212502944',
-    projectId: 'student-planner-app-97c0e',
-    storageBucket: 'student-planner-app-97c0e.firebasestorage.app',
-    iosBundleId: 'com.example.studentPlannerApp',
-  );
-
-  static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyDDCSeqTMVke95Sam-HvlRZcFsNKGtuRyY',
-    appId: '1:812212502944:ios:2b7f47badfdc8440aaa4c5',
-    messagingSenderId: '812212502944',
-    projectId: 'student-planner-app-97c0e',
-    storageBucket: 'student-planner-app-97c0e.firebasestorage.app',
-    iosBundleId: 'com.example.studentPlannerApp',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
