@@ -10,6 +10,7 @@ import 'starter_page.dart';
 import 'home_page.dart';
 import 'action_page.dart';
 import 'create_group_page.dart';
+import 'manage_groups_page.dart';
 
  
 
@@ -44,6 +45,7 @@ class MyApp extends StatelessWidget {
        '/home': (context) => const HomePage(),
       '/action': (context) => const ActionPage(),
       '/create_group': (context) => const CreateGroupPage(),
+      '/manage_groups': (context) => const ManageGroupsPage(),
 
       },
     );

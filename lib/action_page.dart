@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'events_page.dart'; // ✅ Import this
 import 'create_group_page.dart';
-
+import 'manage_groups_page.dart';
 
 class ActionPage extends StatefulWidget {
   const ActionPage({super.key});
@@ -107,7 +107,10 @@ class _ActionPageState extends State<ActionPage> with TickerProviderStateMixin {
             }),
           if (isOpen)
             _buildOption("Manage Groups", Icons.group, () {
-              // To be implemented next
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ManageGroupsPage()),
+                );            
             }),
           // if (isOpen)
           //   _buildOption("Exit Group", Icons.logout, () {
