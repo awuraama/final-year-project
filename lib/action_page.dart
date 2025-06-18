@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'events_page.dart'; // ✅ Import this
+import 'create_group_page.dart';
+
 
 class ActionPage extends StatefulWidget {
   const ActionPage({super.key});
@@ -59,7 +62,7 @@ class _ActionPageState extends State<ActionPage> with TickerProviderStateMixin {
               elevation: 4,
               child: Icon(
                 icon,
-                color: const Color.fromARGB(255, 232, 110, 23), // Use black if preferred
+                color: const Color.fromARGB(255, 232, 110, 23),
               ),
             ),
           ],
@@ -86,13 +89,30 @@ class _ActionPageState extends State<ActionPage> with TickerProviderStateMixin {
         mainAxisSize: MainAxisSize.min,
         children: [
           if (isOpen)
-            _buildOption("Events", Icons.event, () {}),
+            _buildOption("Events", Icons.event, () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      const EventsPage(groupId: 'test-group-id'), // Replace later
+                ),
+              );
+            }),
           if (isOpen)
-            _buildOption("Create Group", Icons.group_add, () {}),
+            _buildOption("Create Group", Icons.group_add, () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const CreateGroupPage()),
+                );            
+            }),
           if (isOpen)
-            _buildOption("Join Group", Icons.group, () {}),
-          if (isOpen)
-            _buildOption("Exit Group", Icons.logout, () {}),
+            _buildOption("Manage Groups", Icons.group, () {
+              // To be implemented next
+            }),
+          // if (isOpen)
+          //   _buildOption("Exit Group", Icons.logout, () {
+          //     // To be implemented next
+          //   }),
           FloatingActionButton(
             onPressed: toggleMenu,
             backgroundColor: const Color.fromARGB(255, 232, 110, 23),

@@ -9,6 +9,8 @@ import 'firebase_options.dart';
 import 'starter_page.dart';
 import 'home_page.dart';
 import 'action_page.dart';
+import 'create_group_page.dart';
+
  
 
 void main() async {
@@ -41,6 +43,8 @@ class MyApp extends StatelessWidget {
        '/': (context) => const StarterPage(),
        '/home': (context) => const HomePage(),
       '/action': (context) => const ActionPage(),
+      '/create_group': (context) => const CreateGroupPage(),
+
       },
     );
   }
