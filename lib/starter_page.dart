@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 
-class starter_page extends StatefulWidget {
+class StarterPage extends StatefulWidget {
+  const StarterPage({super.key});
+
   @override
-  _starter_pageState createState() => _starter_pageState();
+  State<StarterPage> createState() => _StarterPageState();
 }
 
-class _starter_pageState extends State<starter_page>
+class _StarterPageState extends State<StarterPage>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
@@ -37,68 +39,51 @@ class _starter_pageState extends State<starter_page>
         children: [
           // Background image
           Image.asset(
-            'assets/projectback.jpg', // Ensure this image exists in the assets folder
+            'assets/projectback.jpg',
             fit: BoxFit.cover,
           ),
-          // Bouncing button with "Click Me" text
+          // Bouncing logo with tap
           Center(
             child: AnimatedBuilder(
               animation: _animation,
               builder: (context, child) {
                 return Transform.translate(
                   offset: Offset(0, _animation.value),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // Button
-                      TextButton(
-                        onPressed: () {
-                          // Navigate to the Sign In page
-                          Navigator.pushNamed(context, '/signin');
-                        },
-                        style: TextButton.styleFrom(
-                          padding:
-                              const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-                          backgroundColor: Colors.white.withOpacity(0.9), // Slightly transparent white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(50),
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.pushNamed(context, '/home');
+                    },
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Logo with rounded corners
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(20), // Adjust radius as needed
+                          child: Image.asset(
+                            'assets/autoprompt.png',
+                            width: 150,
+                            height: 150,
                           ),
                         ),
-                        child: const Text(
-                          'Student Planner App',
+                        const SizedBox(height: 10),
+                        // Optional text
+                        const Text(
+                          "Tap the Logo to Get Started",
                           style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
+                            fontSize: 14,
+                            fontWeight: FontWeight.normal,
+                            color: Colors.blue,
                             shadows: [
-                        Shadow(
-                          offset: Offset(2.0, 2.0), // X and Y offset
-                          blurRadius: 3.0, // Blurring of the shadow
-                          color: Colors.black, // Shadow color
-                        ),
-                      ],
+                              Shadow(
+                                offset: Offset(2.0, 2.0),
+                                blurRadius: 3.0,
+                                color: Colors.blue,
+                              ),
+                            ],
                           ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                      const SizedBox(height: 10), // Space between button and text
-                      // "Click Me" text
-                      const Text(
-                        "Click Button! Let's Get You Started",
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.normal,
-                          color: Colors.blue,
-                          shadows: [
-                        Shadow(
-                          offset: Offset(2.0, 2.0), // X and Y offset
-                          blurRadius: 3.0, // Blurring of the shadow
-                          color: Colors.blue, // Shadow color
                         ),
                       ],
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 );
               },
