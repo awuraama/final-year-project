@@ -10,13 +10,14 @@ class ManageGroupsPage extends StatefulWidget {
 
 class _ManageGroupsPageState extends State<ManageGroupsPage> {
   String? selectedGroupId;
-  String? selectedView;
+  String selectedView = 'members';
 
   void _addMemberEmail(BuildContext context, String groupId) {
     final emailController = TextEditingController();
+
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (context) => AlertDialog(
         title: const Text("Add Member Email"),
         content: TextField(
           controller: emailController,
@@ -28,12 +29,15 @@ class _ManageGroupsPageState extends State<ManageGroupsPage> {
             onPressed: () async {
               final email = emailController.text.trim();
               if (email.isNotEmpty) {
-                await FirebaseFirestore.instance.collection('groups').doc(groupId).update({
+                await FirebaseFirestore.instance
+                    .collection('groups')
+                    .doc(groupId)
+                    .update({
                   'memberEmails': FieldValue.arrayUnion([email])
                 });
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Member added successfully")),
+                  const SnackBar(content: Text("Member added")),
                 );
               }
             },
@@ -50,48 +54,49 @@ class _ManageGroupsPageState extends State<ManageGroupsPage> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      builder: (_) => StatefulBuilder(
-        builder: (context, setModalState) => Padding(
-          padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Text("Select emails to remove", style: TextStyle(fontWeight: FontWeight.bold)),
-              ),
-              ...memberEmails.map((email) {
-                return CheckboxListTile(
-                  title: Text(email),
-                  value: selectedEmails.contains(email),
-                  onChanged: (checked) {
-                    setModalState(() {
-                      if (checked == true) {
-                        selectedEmails.add(email);
-                      } else {
-                        selectedEmails.remove(email);
-                      }
-                    });
+      builder: (context) => Padding(
+        padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+        child: StatefulBuilder(
+          builder: (context, setModalState) => Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text("Select emails to remove", style: TextStyle(fontWeight: FontWeight.bold)),
+                const SizedBox(height: 10),
+                ...memberEmails.map((email) => CheckboxListTile(
+                      title: Text(email),
+                      value: selectedEmails.contains(email),
+                      onChanged: (val) {
+                        setModalState(() {
+                          if (val == true) {
+                            selectedEmails.add(email);
+                          } else {
+                            selectedEmails.remove(email);
+                          }
+                        });
+                      },
+                    )),
+                const SizedBox(height: 10),
+                ElevatedButton(
+                  onPressed: () async {
+                    if (selectedEmails.isNotEmpty) {
+                      await FirebaseFirestore.instance
+                          .collection('groups')
+                          .doc(groupId)
+                          .update({
+                        'memberEmails': FieldValue.arrayRemove(selectedEmails)
+                      });
+                      Navigator.pop(context);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("Members removed")),
+                      );
+                    }
                   },
-                );
-              }).toList(),
-              const SizedBox(height: 10),
-              ElevatedButton(
-                onPressed: () async {
-                  if (selectedEmails.isNotEmpty) {
-                    await FirebaseFirestore.instance.collection('groups').doc(groupId).update({
-                      'memberEmails': FieldValue.arrayRemove(selectedEmails)
-                    });
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Selected members removed")),
-                    );
-                  }
-                },
-                child: const Text("Remove Selected"),
-              ),
-              const SizedBox(height: 10),
-            ],
+                  child: const Text("Remove Selected"),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -101,7 +106,7 @@ class _ManageGroupsPageState extends State<ManageGroupsPage> {
   void _confirmDeleteGroup(BuildContext context, String groupId) {
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (context) => AlertDialog(
         title: const Text("Confirm Delete"),
         content: const Text("Are you sure you want to delete this group?"),
         actions: [
@@ -122,10 +127,12 @@ class _ManageGroupsPageState extends State<ManageGroupsPage> {
     );
   }
 
-  void _addEventToGroup(BuildContext context, String groupId) {
+  void _addEventDialog(BuildContext context, String groupId) {
     final titleController = TextEditingController();
     final descriptionController = TextEditingController();
-    DateTime? selectedDate;
+    DateTime selectedDate = DateTime.now();
+    List<int> selectedReminderDays = [];
+
     final reminderOptions = {
       7: '7 days before',
       6: '6 days before',
@@ -135,20 +142,15 @@ class _ManageGroupsPageState extends State<ManageGroupsPage> {
       2: '2 days before',
       1: '1 day before',
     };
-    List<int> selectedReminderDays = [];
 
-    showModalBottomSheet(
+    showDialog(
       context: context,
-      isScrollControlled: true,
-      builder: (_) => StatefulBuilder(
-        builder: (context, setModalState) => Padding(
-          padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: const Text("Add Event"),
+          content: SingleChildScrollView(
             child: Column(
-              mainAxisSize: MainAxisSize.min,
               children: [
-                const Text("Add Event", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 TextField(
                   controller: titleController,
                   decoration: const InputDecoration(labelText: "Title"),
@@ -160,70 +162,62 @@ class _ManageGroupsPageState extends State<ManageGroupsPage> {
                 const SizedBox(height: 10),
                 ElevatedButton(
                   onPressed: () async {
-                    final picked = await showDatePicker(
+                    final pickedDate = await showDatePicker(
                       context: context,
-                      initialDate: DateTime.now(),
+                      initialDate: selectedDate,
                       firstDate: DateTime.now(),
-                      lastDate: DateTime(2035),
+                      lastDate: DateTime(2100),
                     );
-                    if (picked != null) {
-                      setModalState(() {
-                        selectedDate = picked;
+                    if (pickedDate != null) {
+                      setDialogState(() {
+                        selectedDate = pickedDate;
                       });
                     }
                   },
-                  child: Text(selectedDate == null
-                      ? "Select Date"
-                      : "Selected: ${selectedDate!.toLocal()}".split(' ')[0]),
+                  child: Text("PickEventDate: ${selectedDate.toLocal()}".split(' ')[0]),
                 ),
                 const SizedBox(height: 10),
-                const Text("Reminder Days:"),
-                ...reminderOptions.entries.map((entry) {
-                  return CheckboxListTile(
-                    title: Text(entry.value),
-                    value: selectedReminderDays.contains(entry.key),
-                    onChanged: (checked) {
-                      setModalState(() {
-                        if (checked == true && selectedReminderDays.length < 3) {
-                          selectedReminderDays.add(entry.key);
-                        } else if (checked == false) {
-                          selectedReminderDays.remove(entry.key);
-                        }
-                      });
-                    },
-                  );
-                }).toList(),
-                ElevatedButton(
-                  onPressed: () async {
-                    if (titleController.text.trim().isEmpty || selectedDate == null) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Please complete all fields")),
-                      );
-                      return;
-                    }
-
-                    await FirebaseFirestore.instance
-                        .collection('groups')
-                        .doc(groupId)
-                        .collection('events')
-                        .add({
-                      'title': titleController.text.trim(),
-                      'description': descriptionController.text.trim(),
-                      'date': Timestamp.fromDate(selectedDate!),
-                      'reminderDaysBefore': selectedReminderDays,
-                      'createdAt': Timestamp.now(),
-                    });
-
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Event added")),
-                    );
-                  },
-                  child: const Text("Save Event"),
-                ),
+                const Text("Reminder Days"),
+                ...reminderOptions.entries.map((entry) => CheckboxListTile(
+                      title: Text(entry.value),
+                      value: selectedReminderDays.contains(entry.key),
+                      onChanged: (val) {
+                        setDialogState(() {
+                          if (val == true && selectedReminderDays.length < 3) {
+                            selectedReminderDays.add(entry.key);
+                          } else if (val == false) {
+                            selectedReminderDays.remove(entry.key);
+                          }
+                        });
+                      },
+                    )),
               ],
             ),
           ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
+            ElevatedButton(
+              onPressed: () async {
+                if (titleController.text.trim().isEmpty) return;
+                await FirebaseFirestore.instance
+                    .collection('groups')
+                    .doc(groupId)
+                    .collection('events')
+                    .add({
+                  'title': titleController.text.trim(),
+                  'description': descriptionController.text.trim(),
+                  'date': selectedDate,
+                  'reminderDaysBefore': selectedReminderDays,
+                  'createdAt': Timestamp.now(),
+                });
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Event added")),
+                );
+              },
+              child: const Text("Save"),
+            ),
+          ],
         ),
       ),
     );
@@ -234,11 +228,15 @@ class _ManageGroupsPageState extends State<ManageGroupsPage> {
     final groupsRef = FirebaseFirestore.instance.collection('groups');
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Manage Groups"), centerTitle: true),
+      appBar: AppBar(
+        title: const Text("Manage Groups"),
+        centerTitle: true,
+      ),
       body: StreamBuilder<QuerySnapshot>(
         stream: groupsRef.snapshots(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
+
           final groups = snapshot.data!.docs;
 
           return ListView.builder(
@@ -253,7 +251,6 @@ class _ManageGroupsPageState extends State<ManageGroupsPage> {
               return Card(
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     ListTile(
                       title: Text(groupName),
@@ -262,7 +259,7 @@ class _ManageGroupsPageState extends State<ManageGroupsPage> {
                         onPressed: () {
                           setState(() {
                             selectedGroupId = isExpanded ? null : groupId;
-                            selectedView = null;
+                            selectedView = 'members';
                           });
                         },
                       ),
@@ -271,61 +268,103 @@ class _ManageGroupsPageState extends State<ManageGroupsPage> {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
                               children: [
-                                ElevatedButton(
-                                  onPressed: () => setState(() => selectedView = 'members'),
-                                  child: const Text("View Members"),
+                                ChoiceChip(
+                                  label: const Text("View Members"),
+                                  selected: selectedView == 'members',
+                                  onSelected: (_) {
+                                    setState(() {
+                                      selectedView = 'members';
+                                    });
+                                  },
                                 ),
                                 const SizedBox(width: 8),
-                                ElevatedButton(
-                                  onPressed: () => setState(() => selectedView = 'events'),
-                                  child: const Text("View Events"),
+                                ChoiceChip(
+                                  label: const Text("View Events"),
+                                  selected: selectedView == 'events',
+                                  onSelected: (_) {
+                                    setState(() {
+                                      selectedView = 'events';
+                                    });
+                                  },
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 10),
+                            const SizedBox(height: 8),
                             if (selectedView == 'members')
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                children: memberEmails.map((email) {
-                                  return ListTile(dense: true, title: Text(email));
-                                }).toList(),
+                                children: [
+                                  const Text("Members:"),
+                                  ...memberEmails.map((email) => ListTile(title: Text(email))),
+                                ],
                               ),
                             if (selectedView == 'events')
-                              const Text("No event list UI here. Use the 📅 button below to add."),
+                              StreamBuilder<QuerySnapshot>(
+                                stream: FirebaseFirestore.instance
+                                    .collection('groups')
+                                    .doc(groupId)
+                                    .collection('events')
+                                    .orderBy('date')
+                                    .snapshots(),
+                                builder: (context, eventSnap) {
+                                  if (eventSnap.connectionState == ConnectionState.waiting) {
+                                    return const CircularProgressIndicator();
+                                  }
+
+                                  final events = eventSnap.data?.docs ?? [];
+
+                                  if (events.isEmpty) return const Text("No events yet.");
+
+                                  return Column(
+                                    children: events.map((event) {
+                                      final title = event['title'];
+                                      final description = event['description'] ?? '';
+                                      final date = (event['date'] as Timestamp).toDate();
+
+                                      return ListTile(
+                                        leading: const Icon(Icons.event),
+                                        title: Text(title),
+                                        subtitle: Text(
+                                          "${description.isNotEmpty ? '$description\n' : ''}${date.day}/${date.month}/${date.year} at ${date.hour}:${date.minute.toString().padLeft(2, '0')}",
+                                        ),
+                                      );
+                                    }).toList(),
+                                  );
+                                },
+                              ),
                             const SizedBox(height: 8),
                             Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
                                 IconButton(
-                                  icon: const Icon(Icons.person_add),
-                                  tooltip: "Add",
                                   onPressed: () => _addMemberEmail(context, groupId),
+                                  icon: const Icon(Icons.person_add),
+                                  tooltip: "Add member",
                                 ),
                                 IconButton(
-                                  icon: const Icon(Icons.remove_circle),
-                                  tooltip: "Remove",
                                   onPressed: () => _removeMemberEmail(context, groupId, memberEmails),
+                                  icon: const Icon(Icons.remove_circle),
+                                  tooltip: "Remove member",
                                 ),
                                 IconButton(
+                                  onPressed: () => _addEventDialog(context, groupId),
                                   icon: const Icon(Icons.calendar_today),
-                                  tooltip: "Add Event",
-                                  onPressed: () => _addEventToGroup(context, groupId),
+                                  tooltip: "Add event",
                                 ),
                                 IconButton(
-                                  icon: const Icon(Icons.delete, color: Colors.red),
-                                  tooltip: "Delete",
                                   onPressed: () => _confirmDeleteGroup(context, groupId),
+                                  icon: const Icon(Icons.delete),
+                                  color: Colors.red,
+                                  tooltip: "Delete group",
                                 ),
                               ],
                             ),
                             const SizedBox(height: 10),
                           ],
                         ),
-                      )
+                      ),
                   ],
                 ),
               );
