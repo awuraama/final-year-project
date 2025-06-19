@@ -127,6 +127,38 @@ class _ManageGroupsPageState extends State<ManageGroupsPage> {
     );
   }
 
+  void _deleteEventConfirmation(BuildContext context, String groupId, String eventId) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Delete Event"),
+        content: const Text("Are you sure you want to delete this event?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancel"),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              await FirebaseFirestore.instance
+                  .collection('groups')
+                  .doc(groupId)
+                  .collection('events')
+                  .doc(eventId)
+                  .delete();
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("Event deleted")),
+              );
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: const Text("Delete"),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _addEventDialog(BuildContext context, String groupId) {
     final titleController = TextEditingController();
     final descriptionController = TextEditingController();
@@ -324,11 +356,15 @@ class _ManageGroupsPageState extends State<ManageGroupsPage> {
                                       final description = event['description'] ?? '';
                                       final date = (event['date'] as Timestamp).toDate();
 
-                                      return ListTile(
-                                        leading: const Icon(Icons.event),
-                                        title: Text(title),
-                                        subtitle: Text(
-                                          "${description.isNotEmpty ? '$description\n' : ''}${date.day}/${date.month}/${date.year} at ${date.hour}:${date.minute.toString().padLeft(2, '0')}",
+                                      return GestureDetector(
+                                        onLongPress: () =>
+                                            _deleteEventConfirmation(context, groupId, event.id),
+                                        child: ListTile(
+                                          leading: const Icon(Icons.event),
+                                          title: Text(title),
+                                          subtitle: Text(
+                                            "${description.isNotEmpty ? '$description\n' : ''}${date.day}/${date.month}/${date.year} at ${date.hour}:${date.minute.toString().padLeft(2, '0')}",
+                                          ),
                                         ),
                                       );
                                     }).toList(),
