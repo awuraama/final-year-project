@@ -90,14 +90,13 @@ class _ActionPageState extends State<ActionPage> with TickerProviderStateMixin {
         children: [
           if (isOpen)
             _buildOption("Events", Icons.event, () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) =>
-                      const EventsPage(groupId: 'test-group-id'), // Replace later
-                ),
-              );
-            }),
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const EventsPage(), // ✅ No groupId needed
+      ),
+    );
+  }),
           if (isOpen)
             _buildOption("Create Group", Icons.group_add, () {
               Navigator.push(
