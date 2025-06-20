@@ -35,15 +35,13 @@ class _StarterPageState extends State<StarterPage>
       // Simulate data fetch from Firestore
       await FirebaseFirestore.instance.collection('events').get();
 
-      // Optional delay to ensure UI catches up with animation (can remove if unnecessary)
+      // Optional delay to ensure UI catches up with animation
       await Future.delayed(const Duration(seconds: 1));
 
-      // Navigate only after data is loaded
       if (mounted) {
         Navigator.pushReplacementNamed(context, '/home');
       }
     } catch (e) {
-      // Handle error or show message (optional)
       debugPrint("Error loading events: $e");
     }
   }
@@ -60,10 +58,12 @@ class _StarterPageState extends State<StarterPage>
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // Background image
-          Image.asset(
-            'assets/projectback.jpg',
-            fit: BoxFit.cover,
+          // Replaced background image with solid color and overlay
+          Container(
+            color: const Color.fromARGB(255, 202, 114, 42), // Base color
+          ),
+          Container(
+            color: const Color.fromARGB(255, 230, 224, 224).withOpacity(0.4), // Dark overlay
           ),
 
           // Bouncing logo
