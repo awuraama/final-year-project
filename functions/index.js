@@ -10,7 +10,7 @@ const SENDGRID_API_KEY = functions.config().sendgrid.key;
 sgMail.setApiKey(SENDGRID_API_KEY);
 
 exports.sendEmailReminders = functions.pubsub
-  .schedule('0 16 * * *')  
+  .schedule('0 6 * * *')  
   .timeZone('Africa/Accra')
   .onRun(async (context) => {
     const today = new Date();
