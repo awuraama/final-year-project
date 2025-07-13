@@ -1,1 +1,26 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"student-planner-app-97c0e","appId":"1:812212502944:android:9ba3e320168d69c1aaa4c5","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"student-planner-app-97c0e","configurations":{"android":"1:812212502944:android:9ba3e320168d69c1aaa4c5","web":"1:812212502944:web:50c864274177c8f3aaa4c5","windows":"1:812212502944:web:ea6630ab1893a11eaaa4c5"}}}}}}
+{
+  "functions": {
+    "source": "functions"
+  },
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "student-planner-app-97c0e",
+          "appId": "1:812212502944:android:9ba3e320168d69c1aaa4c5",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "student-planner-app-97c0e",
+          "configurations": {
+            "android": "1:812212502944:android:9ba3e320168d69c1aaa4c5",
+            "web": "1:812212502944:web:50c864274177c8f3aaa4c5",
+            "windows": "1:812212502944:web:ea6630ab1893a11eaaa4c5"
+          }
+        }
+      }
+    }
+  }
+}
