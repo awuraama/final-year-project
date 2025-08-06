@@ -1,4 +1,4 @@
-# student_planner_app
+# autoprompt app
 
 A new Flutter project.
 
